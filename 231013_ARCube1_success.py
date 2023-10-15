@@ -9,7 +9,7 @@ height = 480
 rows = 4
 cols = 7
 
-axis_length = rows-1  # 큐브 모서리의 길이
+axis_length = rows-1  # AR 큐브 모서리의 길이
 
 # 체커보드의 꼭지점 좌표 생성
 objp = np.zeros((rows * cols, 3), np.float32)
@@ -22,17 +22,17 @@ imgpoints = []  # 2D 이미지 상의 꼭지점 좌표
 def draw_cube(img, corners, imgpts):
     imgpts = np.int32(imgpts).reshape(-1, 2)
     
-    # 큐브 아랫면 그리기
+    # AR 큐브 아랫면 그리기
     for i in range(4):
         img = cv2.line(img, tuple(imgpts[i]), tuple(imgpts[(i+1) % 4]), (0, 0, 255), 1)
 
-    # 큐브 측면 모서리 그리기
+    # AR 큐브 측면 모서리 그리기
     img = cv2.line(img, tuple(imgpts[0]), tuple(imgpts[4]), (0, 0, 255), 1)
     img = cv2.line(img, tuple(imgpts[1]), tuple(imgpts[5]), (0, 0, 255), 1)
     img = cv2.line(img, tuple(imgpts[2]), tuple(imgpts[6]), (0, 0, 255), 1)
     img = cv2.line(img, tuple(imgpts[3]), tuple(imgpts[7]), (0, 0, 255), 1)
 
-    # 윗면 그리기
+    # AR 큐브 윗면 그리기
     img = cv2.line(img, tuple(imgpts[4]), tuple(imgpts[5]), (0, 0, 255), 1)
     img = cv2.line(img, tuple(imgpts[5]), tuple(imgpts[6]), (0, 0, 255), 1)
     img = cv2.line(img, tuple(imgpts[6]), tuple(imgpts[7]), (0, 0, 255), 1)
@@ -69,16 +69,16 @@ while True:
         # 카메라 캘리브레이션 실행
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
      
-        # 3D 큐브 좌표 설정
+        # AR 큐브 좌표 설정
         axis_points = np.float32([[0, 0, 0], [0, axis_length, 0], [axis_length, axis_length, 0], [axis_length, 0, 0], [0, 0, -axis_length], [0, axis_length, -axis_length], [axis_length, axis_length, -axis_length], [axis_length, 0, -axis_length]])
 
-        # 카메라의 위치와 방향 추정 (3D 큐브 위치 결정)
+        # 카메라의 위치와 방향 추정 (AR 큐브 위치 결정)
         _, rvec, tvec = cv2.solvePnP(objp, corners, mtx, dist)
 
-        # 3D 큐브의 꼭지점 이미지 좌표 계산
+        # AR 큐브의 꼭지점 이미지 좌표 계산
         imgpts, _ = cv2.projectPoints(axis_points, rvec, tvec, mtx, dist)
 
-        # 3D 큐브 그리기
+        # AR 큐브 그리기
         frame = draw_cube(frame, corners, imgpts)
     
     # 화면 출력
